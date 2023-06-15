@@ -1,0 +1,20 @@
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.mladich.lastactionnote</id>
+    <name>Last Action Note</name>
+    <version>0.1Beta</version>
+    <vendor email="alex@mladich.com" url="https://mladich.com">Alex Mladich</vendor>
+    <depends>com.intellij.modules.platform</depends>
+    <resource-bundle>Translations</resource-bundle>
+    <description><![CDATA[Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum ]]></description>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity implementation="com.mladich.lastactionnote.listeners.OpeningProjectListener" />
+
+    </extensions>
+    <applicationListeners>
+        <listener class="com.mladich.lastactionnote.listeners.ClosingProjectListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
+        <listener class="com.mladich.lastactionnote.listeners.FileListener" topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </applicationListeners>
+</idea-plugin>
