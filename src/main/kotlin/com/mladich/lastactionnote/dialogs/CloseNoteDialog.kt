@@ -3,8 +3,6 @@ package com.mladich.lastactionnote.dialogs
 import com.intellij.AbstractBundle
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.components.JBList
-import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.dsl.builder.*
 import com.mladich.lastactionnote.listeners.history
 import com.mladich.lastactionnote.tools.CommonData.Companion.currentDate
@@ -12,8 +10,6 @@ import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
 import com.mladich.lastactionnote.tools.NoteManipulator
 import java.awt.Toolkit
 import javax.swing.JComponent
-import javax.swing.JScrollPane
-import javax.swing.table.DefaultTableModel
 
 
 class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
@@ -32,19 +28,16 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
 
     override fun createCenterPanel(): JComponent {
         return panel {
-            row("Date:") {
+            row(AbstractBundle.message(myBundle, "close.dateLabel")) {
                 label(currentDate) // Replace with your Date string
             }
-            row("Edits counter:") {
-                label(history.getCounter().toString()) // Replace with your Edits counter string
-            }
-            row("Files:") {
+            row(AbstractBundle.message(myBundle, "close.filesLabel")) {
                 textArea().applyToComponent{
                     text = history.getHistory().joinToString(separator = "\n")
                     isEditable = false
                     emptyText.text = AbstractBundle.message(myBundle, "close.noFiles")
                 }
-            }
+            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.filesTooltip") + " " + history.getCounter().toString())
             row {
                 textArea()
                     .label(AbstractBundle.message(myBundle, "close.noteLabel"), LabelPosition.TOP)
@@ -56,7 +49,7 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
                         emptyText.text = AbstractBundle.message(myBundle, "close.messageText")
                     }
 
-            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.messageTooltip"))
+            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.noteTooltip"))
 
         }
     }

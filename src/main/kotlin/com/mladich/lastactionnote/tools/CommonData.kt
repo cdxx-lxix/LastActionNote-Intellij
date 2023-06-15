@@ -7,7 +7,8 @@ import java.util.*
 
 class CommonData {
     companion object {
+        const val pluginFileName = ".lastactionnote"
         val myBundle: ResourceBundle = ResourceBundle.getBundle("Translations")
-        var currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        var currentDate: String = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
     }
 }

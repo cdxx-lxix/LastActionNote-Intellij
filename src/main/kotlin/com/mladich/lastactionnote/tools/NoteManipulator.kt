@@ -3,16 +3,14 @@ package com.mladich.lastactionnote.tools
 import com.google.gson.GsonBuilder
 import com.intellij.AbstractBundle
 import com.intellij.openapi.project.Project
-import com.mladich.lastactionnote.dialogs.CloseNoteDialog
 import com.mladich.lastactionnote.listeners.history
 import com.mladich.lastactionnote.tools.CommonData.Companion.currentDate
 import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
+import com.mladich.lastactionnote.tools.CommonData.Companion.pluginFileName
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class NoteManipulator {
@@ -21,7 +19,7 @@ class NoteManipulator {
         if (note.text?.isEmpty() == true) {
             note.text = AbstractBundle.message(myBundle, "empty.NoteText") // Sets the text only so it won't mess with files
         }
-        val mrJson = File(project.basePath, ".lastactionnote")
+        val mrJson = File(project.basePath, pluginFileName)
         val gson = GsonBuilder().setPrettyPrinting().create()
         val jsonString = gson.toJson(note)
             try {
@@ -33,7 +31,7 @@ class NoteManipulator {
 
     fun openData(project: Project): Note {
         // Tries to read the .lastactionnote file if there is none sets the date to default values
-        val mrJson = File(project.basePath, ".lastactionnote")
+        val mrJson = File(project.basePath, pluginFileName)
         var note: Note? = null
         try {
             note = if (mrJson.exists()) {
@@ -62,8 +60,8 @@ class NoteManipulator {
     fun setEmptyNote(project: Project): Note {
         // Sets Note's values to default
         val testList: MutableList<String> = ArrayList()
-        testList.add(AbstractBundle.message(myBundle, "empty.NoteFiles"))
-        return Note(AbstractBundle.message(myBundle, "empty.NoteText"), project.name, testList)
+        testList.add(AbstractBundle.message(myBundle, "close.noFiles"))
+        return Note(AbstractBundle.message(myBundle, "close.noFiles"), project.name, testList)
     }
 
     class Note internal constructor(var text: String?, var projectName: String, var files: List<String?>?, var date: String = currentDate, var fileCounter: Int = history.getCounter())

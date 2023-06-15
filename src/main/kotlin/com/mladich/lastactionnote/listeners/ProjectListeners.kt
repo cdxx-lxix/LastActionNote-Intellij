@@ -32,7 +32,7 @@ class ClosingProjectListener : PostStartupActivity(), ProjectManagerListener {
 class OpeningProjectListener : StartupActivity {
     override fun runActivity(@NotNull project: Project) {
         val dialogWindow = OpenNoteDialog(project)
-        dialogWindow.showMessage()
+        dialogWindow.showAndGet()
         project.service<FileHistory>()
         history.clearHistoryAndCounter()
     }
