@@ -24,4 +24,9 @@ class FileHistory {
             editedFiles.removeLast() // Keep the list size limited to maxSize
         }
     }
+
+    fun clearHistoryAndCounter() {
+        editedFiles.clear()
+        fileCounter = 0
+    }
 }

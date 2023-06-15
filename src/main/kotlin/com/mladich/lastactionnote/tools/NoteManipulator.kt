@@ -4,6 +4,8 @@ import com.google.gson.GsonBuilder
 import com.intellij.AbstractBundle
 import com.intellij.openapi.project.Project
 import com.mladich.lastactionnote.dialogs.CloseNoteDialog
+import com.mladich.lastactionnote.listeners.history
+import com.mladich.lastactionnote.tools.CommonData.Companion.currentDate
 import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
 import java.io.File
 import java.io.FileReader
@@ -15,10 +17,19 @@ import kotlin.collections.ArrayList
 
 class NoteManipulator {
     fun saveData(text: String?, files: List<String?>?, project: Project) {
-        val note = Note(text, files)
+        val note = Note(text, project.name, files)
+        if (note.text?.isEmpty() == true) {
+            note.text = AbstractBundle.message(myBundle, "empty.NoteText") // Sets the text only so it won't mess with files
+        }
         val mrJson = File(project.basePath, ".lastactionnote")
-        writeData(note, mrJson)
-    }
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val jsonString = gson.toJson(note)
+            try {
+                FileWriter(mrJson).use { file -> file.write(jsonString) }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
 
     fun openData(project: Project): Note {
         // Tries to read the .lastactionnote file if there is none sets the date to default values
@@ -29,7 +40,7 @@ class NoteManipulator {
                 readData(mrJson)
             } else {
                 println("File does not exist")
-                setEmptyNote()
+                setEmptyNote(project)
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -40,20 +51,6 @@ class NoteManipulator {
         return note!!
     }
 
-    private fun writeData(data: Note, dataFile: File) {
-        val gson = GsonBuilder().setPrettyPrinting().create()
-        val jsonString = gson.toJson(data)
-        println(jsonString)
-        if (data.text?.isEmpty() == true) {
-            setEmptyNote()
-        } else {
-            try {
-                FileWriter(dataFile).use { file -> file.write(jsonString) }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
     private fun readData(data: File): Note? {
         // Reads the .lastactionnote file and returns it as a Note
         FileReader(data).use { fileReader ->
@@ -62,14 +59,15 @@ class NoteManipulator {
         }
     }
 
-    private fun setEmptyNote(): Note {
+    fun setEmptyNote(project: Project): Note {
         // Sets Note's values to default
         val testList: MutableList<String> = ArrayList()
         testList.add(AbstractBundle.message(myBundle, "empty.NoteFiles"))
-        return Note(AbstractBundle.message(myBundle, "empty.NoteText"), testList)
+        return Note(AbstractBundle.message(myBundle, "empty.NoteText"), project.name, testList)
     }
 
-    class Note internal constructor(var text: String?, var files: List<String?>?)
+    class Note internal constructor(var text: String?, var projectName: String, var files: List<String?>?, var date: String = currentDate, var fileCounter: Int = history.getCounter())
 
 }
+
 
