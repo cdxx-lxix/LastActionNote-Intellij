@@ -21,16 +21,20 @@ class OpenNoteDialog (private val project: Project): DialogWrapper(false) {
     private val data = NoteManipulator().openData(project)
     init {
         isOKActionEnabled = true
-        setOKButtonText(AbstractBundle.message(myBundle, "close.OKButton"))
+        setOKButtonText(AbstractBundle.message(myBundle, "open.OKButton"))
         isResizable = false
-        title = AbstractBundle.message(myBundle, "close.DialogTitle")
+        title = AbstractBundle.message(myBundle, "open.DialogTitle")
         val screenSize = Toolkit.getDefaultToolkit().screenSize
         setSize((screenSize.width / 6).coerceAtLeast(200), (screenSize.height / 6).coerceAtLeast(200))
         init()
     }
+    override fun createActions(): Array<Action> {
+        // Removes every other button except for OK
+        return arrayOf(okAction)
+    }
     override fun createCenterPanel(): JComponent {
         return panel {
-            row(AbstractBundle.message(myBundle, "close.dateLabel")) {
+            row(AbstractBundle.message(myBundle, "open.dateLabel")) {
                 label(data.date) // Replace with your Date string
             }
             row(AbstractBundle.message(myBundle, "close.filesLabel")) {
@@ -51,8 +55,7 @@ class OpenNoteDialog (private val project: Project): DialogWrapper(false) {
                         isEditable = false
                     }
 
-            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.noteTooltip"))
-
+            }
         }
     }
 }

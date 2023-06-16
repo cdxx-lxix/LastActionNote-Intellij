@@ -26,6 +26,7 @@ class FileHistory {
     }
 
     fun clearHistoryAndCounter() {
+        // Clears history and data so cache won't mess it.
         editedFiles.clear()
         fileCounter = 0
     }

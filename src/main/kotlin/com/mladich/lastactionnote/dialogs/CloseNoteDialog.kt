@@ -9,11 +9,12 @@ import com.mladich.lastactionnote.tools.CommonData.Companion.currentDate
 import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
 import com.mladich.lastactionnote.tools.NoteManipulator
 import java.awt.Toolkit
+import javax.swing.Action
 import javax.swing.JComponent
 
 
 class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
-    private var lastThingsField = ""
+    private var lastThingsField = "" // Puts user's data here. See line 45 to see the bind.
 
     init {
         isOKActionEnabled = true
@@ -21,6 +22,7 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
         setCancelButtonText(AbstractBundle.message(myBundle, "close.CancelButton"))
         isResizable = false
         title = AbstractBundle.message(myBundle, "close.DialogTitle")
+        // Scales dialog window with user's screen size but makes it minimum of 200x200
         val screenSize = Toolkit.getDefaultToolkit().screenSize
         setSize((screenSize.width / 6).coerceAtLeast(200), (screenSize.height / 6).coerceAtLeast(200))
         init()
@@ -29,32 +31,34 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
     override fun createCenterPanel(): JComponent {
         return panel {
             row(AbstractBundle.message(myBundle, "close.dateLabel")) {
-                label(currentDate) // Replace with your Date string
+                label(currentDate) // Gets current date from CommonData
             }
             row(AbstractBundle.message(myBundle, "close.filesLabel")) {
                 textArea().applyToComponent{
-                    text = history.getHistory().joinToString(separator = "\n")
-                    isEditable = false
-                    emptyText.text = AbstractBundle.message(myBundle, "close.noFiles")
+                    text = history.getHistory().joinToString(separator = "\n") // Gets history from CommonData
+                    isEditable = false // Disable edit. There is no table at the time of development TODO: Remake using table\list when introduced
+                    emptyText.text = AbstractBundle.message(myBundle, "close.noFiles") // Sets a default empty message if the user didn't edit anything
                 }
             }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.filesTooltip") + " " + history.getCounter().toString())
             row {
                 textArea()
                     .label(AbstractBundle.message(myBundle, "close.noteLabel"), LabelPosition.TOP)
-                    .bindText(::lastThingsField)
+                    .bindText(::lastThingsField) // Connects input data with my variable
                     .rows(10)
                     .columns(30)
-                    .focused()
+                    .focused() // Puts the caret in it
                     .applyToComponent{
+                        // Sets a default empty message
                         emptyText.text = AbstractBundle.message(myBundle, "close.messageText")
                     }
 
-            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.noteTooltip"))
+            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.noteTooltip")) // Text under the field
 
         }
     }
 
     public override fun doOKAction() {
+        // Save data and close
         println("OK ACTION") // TODO: REMOVE ON PRODUCTION
         val files = history.getHistory()
         val noteManipulator = NoteManipulator()
@@ -63,6 +67,7 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
     }
 
     override fun doCancelAction() {
+        // Set empty note, save it and exit
         println("CANCEL ACTION") // TODO: REMOVE ON PRODUCTION
         NoteManipulator().setEmptyNote(project)
         super.doCancelAction()

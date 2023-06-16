@@ -65,7 +65,7 @@ class NoteManipulator {
     }
 
     class Note internal constructor(var text: String?, var projectName: String, var files: List<String?>?, var date: String = currentDate, var fileCounter: Int = history.getCounter())
-
+    // Data storage class for notes
 }
 
 

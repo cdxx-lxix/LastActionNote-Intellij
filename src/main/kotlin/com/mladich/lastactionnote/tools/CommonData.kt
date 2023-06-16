@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class CommonData {
+    // Place to store some useful data across classes
     companion object {
         const val pluginFileName = ".lastactionnote"
         val myBundle: ResourceBundle = ResourceBundle.getBundle("Translations")
