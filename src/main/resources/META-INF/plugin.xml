@@ -16,5 +16,7 @@
     <applicationListeners>
         <listener class="com.mladich.lastactionnote.listeners.ClosingProjectListener" topic="com.intellij.openapi.project.ProjectManagerListener"/>
         <listener class="com.mladich.lastactionnote.listeners.FileListener" topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+        <listener class="com.mladich.lastactionnote.listeners.CrossButtonListener" topic="com.intellij.ide.AppLifecycleListener"/>
+        <listener class="com.mladich.lastactionnote.listeners.CanExit" topic="com.intellij.openapi.application.ApplicationListener" />
     </applicationListeners>
 </idea-plugin>
