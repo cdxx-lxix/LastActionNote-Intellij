@@ -4,10 +4,8 @@ import com.intellij.AbstractBundle
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.dsl.builder.*
-import com.mladich.lastactionnote.listeners.CanExit
 import com.mladich.lastactionnote.listeners.history
 import com.mladich.lastactionnote.tools.CommonData.Companion.currentDate
-import com.mladich.lastactionnote.tools.CommonData.Companion.exitPlease
 import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
 import com.mladich.lastactionnote.tools.NoteManipulator
 import java.awt.Toolkit
@@ -63,19 +61,13 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
         /* super.do---Action MUST BE THE FIRST IN ORDER FOR THIS ACTION TO BE PERFORMED
         * I JUST FUCKING HATE JB DOCUMENTATION */
         // Save data and close
-        println("OK ACTION") // TODO: REMOVE ON PRODUCTION
-        println("NOTE: " + lastThingsField)
         val files = history.getHistory()
         val noteManipulator = NoteManipulator()
         noteManipulator.saveData(lastThingsField, files, project)
-
     }
 
     override fun doCancelAction() {
+        // Cancel exit/project close
         super.doCancelAction()
-        // Set empty note, save it and exit
-//        println("CANCEL ACTION") // TODO: REMOVE ON PRODUCTION
-        NoteManipulator().setEmptyNote(project)
-
     }
 }

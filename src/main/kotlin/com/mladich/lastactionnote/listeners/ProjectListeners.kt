@@ -1,7 +1,8 @@
 package com.mladich.lastactionnote.listeners
 
-import com.intellij.ide.AppLifecycleListener
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationListener
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
@@ -9,58 +10,83 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManagerListener
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.project.VetoableProjectManagerListener
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.mladich.lastactionnote.dialogs.CloseNoteDialog
 import com.mladich.lastactionnote.dialogs.OpenNoteDialog
-import com.mladich.lastactionnote.tools.CommonData.Companion.exitPlease
 import com.mladich.lastactionnote.tools.CommonData.Companion.noteSaved
-import com.mladich.lastactionnote.tools.CommonData.Companion.projectInstance
 import com.mladich.lastactionnote.tools.FileHistory
 import org.jetbrains.annotations.NotNull
 
 
 val history = service<FileHistory>()
-class ClosingProjectListener : ProjectManagerListener {
-
-    override fun projectClosingBeforeSave(project: Project) {
-        if (!noteSaved) {
-            val dialogWindow = CloseNoteDialog(project)
-            dialogWindow.showAndGet()
-            noteSaved = true
-        }
-    }
-}
-class CrossButtonListener: AppLifecycleListener {
-    override fun appClosing() {
-        super.appClosing()
-        if (projectInstance != null) {
-            val dialogWindow = CloseNoteDialog(projectInstance!!)
-            dialogWindow.showAndGet()
-            noteSaved = true
-        }
-    }
-}
-
-class CanExit :  ApplicationListener {
-    override fun canExitApplication(): Boolean {
-        super.canExitApplication()
-        println("Can I exit please?" + exitPlease)
-        return exitPlease
-    }
-}
+//class ClosingProjectListener : ProjectManagerListener {
+//
+//    override fun projectClosingBeforeSave(project: Project) {
+//        if (!noteSaved) {
+//            val dialogWindow = CloseNoteDialog(project)
+//            dialogWindow.showAndGet()
+//            exitPlease = dialogWindow.exitCode
+//            noteSaved = true
+//        }
+//    }
+//}
+//class CrossButtonListener: AppLifecycleListener {
+//    override fun appClosing() {
+//        super.appClosing()
+//        if (!projectInstance?.isDisposed!!) {
+//            // This IF checks the state of the project. If there is no such check it shows dialog even on the start windows with projects.
+//            val dialogWindow = CloseNoteDialog(projectInstance!!)
+//            dialogWindow.showAndGet()
+//            exitPlease = dialogWindow.exitCode
+//            noteSaved = true
+//        }
+//    }
+//}
 
 class OpeningProjectListener : StartupActivity {
+    fun showDialog(@NotNull project: Project): Boolean {
+        return if (!noteSaved) {
+            val dialogWindow = CloseNoteDialog(project)
+            dialogWindow.showAndGet()
+            if (dialogWindow.exitCode == 1) {
+                false
+            } else {
+                noteSaved = true
+                true
+            }
+        } else {
+            true
+        }
+    }
     override fun runActivity(@NotNull project: Project) {
-        projectInstance = project
-        noteSaved = false
+        // This ugly monstrosity intercepts X-button behaviour and allows cancel of IDE closing
+        val parentDisposable: Disposable = Disposer.newDisposable()
+        ApplicationManager.getApplication().addApplicationListener(object : ApplicationListener {
+            override fun canExitApplication(): Boolean {
+                println("Closing IDE")
+                return showDialog(project)
+            }
+        }, parentDisposable )
+
+        ProjectManager.getInstance().addProjectManagerListener(object : VetoableProjectManagerListener {
+            override fun canClose(project: Project): Boolean {
+                println("Closing project")
+                return showDialog(project)
+            }
+        })
+
+
         val dialogWindow = OpenNoteDialog(project)
         dialogWindow.showAndGet()
+        noteSaved = false
         project.service<FileHistory>()
         history.clearHistoryAndCounter()
     }
+
 }
 
 class FileListener : FileEditorManagerListener {
