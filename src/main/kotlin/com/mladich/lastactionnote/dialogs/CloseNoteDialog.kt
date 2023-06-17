@@ -11,9 +11,8 @@ import com.mladich.lastactionnote.tools.NoteManipulator
 import java.awt.Toolkit
 import javax.swing.JComponent
 
-
 class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
-    private var lastThingsField = "" // Puts user's data here. See line 45 to see the bind.
+    private var lastThingsField = "" // Puts user's data here on doOKAction. See line 45 to see the bind.
 
     init {
         isOKActionEnabled = true

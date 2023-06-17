@@ -23,35 +23,12 @@ import org.jetbrains.annotations.NotNull
 
 
 val history = service<FileHistory>()
-//class ClosingProjectListener : ProjectManagerListener {
-//
-//    override fun projectClosingBeforeSave(project: Project) {
-//        if (!noteSaved) {
-//            val dialogWindow = CloseNoteDialog(project)
-//            dialogWindow.showAndGet()
-//            exitPlease = dialogWindow.exitCode
-//            noteSaved = true
-//        }
-//    }
-//}
-//class CrossButtonListener: AppLifecycleListener {
-//    override fun appClosing() {
-//        super.appClosing()
-//        if (!projectInstance?.isDisposed!!) {
-//            // This IF checks the state of the project. If there is no such check it shows dialog even on the start windows with projects.
-//            val dialogWindow = CloseNoteDialog(projectInstance!!)
-//            dialogWindow.showAndGet()
-//            exitPlease = dialogWindow.exitCode
-//            noteSaved = true
-//        }
-//    }
-//}
-
 class OpeningProjectListener : StartupActivity {
     fun showDialog(@NotNull project: Project): Boolean {
         return if (!noteSaved) {
             val dialogWindow = CloseNoteDialog(project)
             dialogWindow.showAndGet()
+            // OK exit code - 0, Cancel\Close exit code - 1
             if (dialogWindow.exitCode == 1) {
                 false
             } else {
@@ -71,22 +48,19 @@ class OpeningProjectListener : StartupActivity {
                 return showDialog(project)
             }
         }, parentDisposable )
-
+        // This ugly monstrosity intercepts "close project" behaviour and allows cancel of project closing
         ProjectManager.getInstance().addProjectManagerListener(object : VetoableProjectManagerListener {
             override fun canClose(project: Project): Boolean {
                 println("Closing project")
                 return showDialog(project)
             }
         })
-
-
         val dialogWindow = OpenNoteDialog(project)
         dialogWindow.showAndGet()
-        noteSaved = false
-        project.service<FileHistory>()
-        history.clearHistoryAndCounter()
+        noteSaved = false // Reset value to show dialogs
+        project.service<FileHistory>() // Start history writing
+        history.clearHistoryAndCounter() // Clear previous history
     }
-
 }
 
 class FileListener : FileEditorManagerListener {
