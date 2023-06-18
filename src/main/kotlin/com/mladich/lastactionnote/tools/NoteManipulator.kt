@@ -43,9 +43,6 @@ class NoteManipulator {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        if (note != null) {
-            println(note.files)
-        }
         return note!!
     }
 

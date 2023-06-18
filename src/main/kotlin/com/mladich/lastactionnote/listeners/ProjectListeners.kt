@@ -44,14 +44,12 @@ class OpeningProjectListener : StartupActivity {
         val parentDisposable: Disposable = Disposer.newDisposable()
         ApplicationManager.getApplication().addApplicationListener(object : ApplicationListener {
             override fun canExitApplication(): Boolean {
-                println("Closing IDE")
                 return showDialog(project)
             }
         }, parentDisposable )
         // This ugly monstrosity intercepts "close project" behaviour and allows cancel of project closing
         ProjectManager.getInstance().addProjectManagerListener(object : VetoableProjectManagerListener {
             override fun canClose(project: Project): Boolean {
-                println("Closing project")
                 return showDialog(project)
             }
         })
