@@ -2,11 +2,16 @@
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.mladich.lastactionnote</id>
     <name>Last Action Note</name>
-    <version>0.1Beta</version>
+    <version>1.0b</version>
     <vendor email="alex@mladich.com" url="https://mladich.com">Alex Mladich</vendor>
     <depends>com.intellij.modules.platform</depends>
     <resource-bundle>Translations</resource-bundle>
-    <description><![CDATA[Lorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsumLorem ipsum ]]></description>
+    <description><![CDATA[ Asking yourself, "What was I doing?" every time you open a project? I've got your back.
+Last Action Note is a simple plugin. It allows you to leave notes for yourself when closing a project or IDE and reminds you when you return.
+With the plugin installed, when you close a project or IDE, it prompts you and asks you to leave a note.
+Additionally, LAN tracks files that were changed and keeps a total count of them, along with the names of the last 5.
+There is also a timestamp with your current time in your preferred local format.
+The data is stored in the root directory of every opened project in a ".lastactionnote" file. ]]></description>
 
 
     <extensions defaultExtensionNs="com.intellij">

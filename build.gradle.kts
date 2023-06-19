@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.mladich"
-version = "0.1Beta"
+version = "1.0b"
 
 repositories {
     mavenCentral()

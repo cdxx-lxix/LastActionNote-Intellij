@@ -19,7 +19,7 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
         setOKButtonText(AbstractBundle.message(myBundle, "close.OKButton"))
         setCancelButtonText(AbstractBundle.message(myBundle, "close.CancelButton"))
         isResizable = false
-        title = AbstractBundle.message(myBundle, "close.DialogTitle")
+        title = AbstractBundle.message(myBundle, "close.DialogTitle") + "/ Project: " + project.name
         // Scales dialog window with user's screen size but makes it minimum of 200x200
         val screenSize = Toolkit.getDefaultToolkit().screenSize
         setSize((screenSize.width / 6).coerceAtLeast(200), (screenSize.height / 6).coerceAtLeast(200))
@@ -33,11 +33,11 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
             }
             row(AbstractBundle.message(myBundle, "close.filesLabel")) {
                 textArea().applyToComponent{
-                    text = history.getHistory().joinToString(separator = "\n") // Gets history from CommonData
+                    text = history.getHistory(project).joinToString(separator = "\n") // Gets history from CommonData
                     isEditable = false // Disable edit. There is no table at the time of development TODO: Remake using table\list when introduced
                     emptyText.text = AbstractBundle.message(myBundle, "close.noFiles") // Sets a default empty message if the user didn't edit anything
                 }
-            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.filesTooltip") + " " + history.getCounter().toString())
+            }.layout(RowLayout.PARENT_GRID).rowComment(AbstractBundle.message(myBundle, "close.filesTooltip") + " " + history.getCounter(project).toString())
             row {
                 textArea()
                     .label(AbstractBundle.message(myBundle, "close.noteLabel"), LabelPosition.TOP)
@@ -60,7 +60,7 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
         /* super.do---Action MUST BE THE FIRST IN ORDER FOR THIS ACTION TO BE PERFORMED
         * I JUST FUCKING HATE JB DOCUMENTATION */
         // Save data and close
-        val files = history.getHistory()
+        val files = history.getHistory(project)
         val noteManipulator = NoteManipulator()
         noteManipulator.saveData(lastThingsField, files, project)
     }

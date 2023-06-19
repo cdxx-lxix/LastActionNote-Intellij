@@ -10,7 +10,7 @@ import java.awt.Toolkit
 import javax.swing.Action
 import javax.swing.JComponent
 
-class OpenNoteDialog (private val project: Project): DialogWrapper(false) {
+class OpenNoteDialog (project: Project): DialogWrapper(false) {
     private val data = NoteManipulator().openData(project)
     init {
         isOKActionEnabled = true

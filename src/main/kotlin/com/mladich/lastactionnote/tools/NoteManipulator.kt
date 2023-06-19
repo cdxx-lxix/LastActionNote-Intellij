@@ -15,7 +15,7 @@ import java.io.IOException
 
 class NoteManipulator {
     fun saveData(text: String?, files: List<String?>?, project: Project) {
-        val note = Note(text, project.name, files)
+        val note = Note(text = text, projectName = project.name, files = files, fileCounter = history.getCounter(project))
         if (note.text?.isEmpty() == true) {
             note.text = AbstractBundle.message(myBundle, "empty.NoteText") // Sets the text only so it won't mess with files
         }
@@ -58,10 +58,10 @@ class NoteManipulator {
         // Sets Note's values to default
         val testList: MutableList<String> = ArrayList()
         testList.add(AbstractBundle.message(myBundle, "close.noFiles"))
-        return Note(AbstractBundle.message(myBundle, "close.noFiles"), project.name, testList)
+        return Note(AbstractBundle.message(myBundle, "close.noFiles"), project.name, testList, history.getCounter(project))
     }
 
-    class Note internal constructor(var text: String?, var projectName: String, var files: List<String?>?, var date: String = currentDate, var fileCounter: Int = history.getCounter())
+    class Note internal constructor(var text: String?, var projectName: String, var files: List<String?>?, var fileCounter: Int, var date: String = currentDate )
     // Data storage class for notes
 }
 

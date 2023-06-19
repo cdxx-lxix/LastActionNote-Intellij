@@ -17,7 +17,8 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.mladich.lastactionnote.dialogs.CloseNoteDialog
 import com.mladich.lastactionnote.dialogs.OpenNoteDialog
-import com.mladich.lastactionnote.tools.CommonData.Companion.noteSaved
+import com.mladich.lastactionnote.tools.CommonData
+import com.mladich.lastactionnote.tools.CommonData.Companion.openedProjects
 import com.mladich.lastactionnote.tools.FileHistory
 import org.jetbrains.annotations.NotNull
 
@@ -25,21 +26,29 @@ import org.jetbrains.annotations.NotNull
 val history = service<FileHistory>()
 class OpeningProjectListener : StartupActivity {
     fun showDialog(@NotNull project: Project): Boolean {
-        return if (!noteSaved) {
+        val currentClosingProject = openedProjects[project]
+        return if (!currentClosingProject!!.isNoteSaved) { // Open if note isn't saved
             val dialogWindow = CloseNoteDialog(project)
             dialogWindow.showAndGet()
             // OK exit code - 0, Cancel\Close exit code - 1
             if (dialogWindow.exitCode == 1) {
-                false
+                false // Don't close
             } else {
-                noteSaved = true
-                true
+                currentClosingProject.isNoteSaved = true
+                true // Save and close
             }
         } else {
-            true
+            true // Close if note already saved
         }
     }
     override fun runActivity(@NotNull project: Project) {
+        println("Project:" + project.name) // TODO: REMOVE ON PRODUCTION
+        if (!openedProjects.containsKey(project)) {
+            // Adds current instance to the map if it's not already present
+            openedProjects[project] =
+                CommonData.Companion.ProjectData(isNoteSaved = false, fileHistory = mutableListOf(), fileCounter = 0)
+        }
+        println("Opened projects map: " + openedProjects)
         // This ugly monstrosity intercepts X-button behaviour and allows cancel of IDE closing
         val parentDisposable: Disposable = Disposer.newDisposable()
         ApplicationManager.getApplication().addApplicationListener(object : ApplicationListener {
@@ -55,9 +64,7 @@ class OpeningProjectListener : StartupActivity {
         })
         val dialogWindow = OpenNoteDialog(project)
         dialogWindow.showAndGet()
-        noteSaved = false // Reset value to show dialogs
         project.service<FileHistory>() // Start history writing
-        history.clearHistoryAndCounter() // Clear previous history
     }
 }
 
@@ -75,8 +82,8 @@ class FileListener : FileEditorManagerListener {
                     Disposer.dispose(disposable)
 
                     // Add the file to history and increase counter
-                    history.addToHistory(file)
-                    history.increaseCounter()
+                    history.addToHistory(file, source.project)
+                    history.increaseCounter(source.project)
                 }
             }
             document.addDocumentListener(documentListener, disposable)
