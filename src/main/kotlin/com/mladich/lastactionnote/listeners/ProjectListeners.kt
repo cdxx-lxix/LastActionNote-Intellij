@@ -30,21 +30,17 @@ class OpeningProjectListener : StartupActivity {
         val dialogWindow = CloseNoteDialog(project)
         dialogWindow.showAndGet()
         // OK exit code - 0, Cancel\Close exit code - 1
-        return if (dialogWindow.exitCode == 1) {
-            false // Don't close
-        } else {
+        return if (dialogWindow.exitCode == 1) false else {
             currentClosingProject.isNoteSaved = true
-            true // Save and close
+            true
         }
     }
     fun checkConditions(@NotNull project: Project): Boolean {
-        val currentClosingProject = openedProjects[project]
-        return when(currentClosingProject!!.isExcluded) {
-            true -> true // When excluded - close
-            false -> when(currentClosingProject.isNoteSaved) { // When NOT excluded check for saved note
-                true-> true // When NOT excluded but note saved - close
-                false-> showDialog(project, currentClosingProject) // When NOT excluded and NOT saved, show dialog
-            }
+        val currentClosingProject = openedProjects[project] ?: return false
+        return when {
+            currentClosingProject.isExcluded -> true // When excluded - close
+            currentClosingProject.isNoteSaved -> true // When not excluded and note is saved - close
+            else -> showDialog(project, currentClosingProject) // When NOT excluded and NOT saved - show dialog
         }
     }
     override fun runActivity(@NotNull project: Project) {
