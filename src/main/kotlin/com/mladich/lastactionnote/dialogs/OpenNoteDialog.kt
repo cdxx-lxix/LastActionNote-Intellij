@@ -1,9 +1,12 @@
 package com.mladich.lastactionnote.dialogs
 
 import com.intellij.AbstractBundle
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.dsl.builder.*
+import com.mladich.lastactionnote.settings.LANSettingsService
+import com.mladich.lastactionnote.tools.CommonData
 import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
 import com.mladich.lastactionnote.tools.NoteManipulator
 import java.awt.Toolkit
@@ -12,6 +15,9 @@ import javax.swing.JComponent
 
 class OpenNoteDialog (project: Project): DialogWrapper(false) {
     private val data = NoteManipulator().openData(project)
+    private var checkbox: Boolean = false
+    private val myProject = project
+
     init {
         isOKActionEnabled = true
         setOKButtonText(AbstractBundle.message(myBundle, "open.OKButton"))
@@ -49,6 +55,18 @@ class OpenNoteDialog (project: Project): DialogWrapper(false) {
                     }
 
             }
+            row{
+                checkBox(AbstractBundle.message(myBundle, "open.exclusionCheckbox"))
+                    .bindSelected(::checkbox)
+            }
         }
+    }
+
+    override fun doOKAction() {
+        super.doOKAction()
+        // If a user ticks a checkbox changes settings value for exclusion
+        val projectSettings = myProject.service<LANSettingsService>().state
+        projectSettings.projectExclusion = checkbox
+        CommonData.openedProjects[myProject]!!.isExcluded = checkbox
     }
 }

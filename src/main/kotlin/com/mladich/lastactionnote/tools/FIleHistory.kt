@@ -24,16 +24,8 @@ class FileHistory {
         val currentProject = openedProjects[project]
         currentProject!!.fileHistory.remove(file.name) // Remove the file if it already exists in the list
         currentProject.fileHistory.add(file.name) // Add the file to the beginning of the list
-//        editedFiles.remove(file.name)
-//        editedFiles.add(file.name)
         if (currentProject.fileHistory.size > maxSize) {
             currentProject.fileHistory.removeFirst() // Keep the list size limited to maxSize
         }
-    }
-    fun clearHistoryAndCounter(project: Project) {
-        // Clears history and data so cache won't mess it.
-        val currentProject = openedProjects[project]
-        currentProject!!.fileHistory.clear()
-        currentProject.fileCounter = 0
     }
 }

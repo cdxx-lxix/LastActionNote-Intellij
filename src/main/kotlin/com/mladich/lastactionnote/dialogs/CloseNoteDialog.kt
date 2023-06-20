@@ -22,7 +22,7 @@ class CloseNoteDialog(private val project: Project) : DialogWrapper(true) {
         title = AbstractBundle.message(myBundle, "close.DialogTitle") + "/ Project: " + project.name
         // Scales dialog window with user's screen size but makes it minimum of 200x200
         val screenSize = Toolkit.getDefaultToolkit().screenSize
-        setSize((screenSize.width / 6).coerceAtLeast(200), (screenSize.height / 6).coerceAtLeast(200))
+        setSize((screenSize.width / 6).coerceAtLeast(200), (screenSize.height / 6).coerceAtLeast(220))
         init()
     }
 

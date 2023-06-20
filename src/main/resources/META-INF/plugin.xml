@@ -2,7 +2,7 @@
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.mladich.lastactionnote</id>
     <name>Last Action Note</name>
-    <version>1.0b</version>
+    <version>1.1b</version>
     <vendor email="alex@mladich.com" url="https://mladich.com">Alex Mladich</vendor>
     <depends>com.intellij.modules.platform</depends>
     <resource-bundle>Translations</resource-bundle>
@@ -16,7 +16,17 @@ The data is stored in the root directory of every opened project in a ".lastacti
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="com.mladich.lastactionnote.listeners.OpeningProjectListener" />
+        <projectService serviceImplementation="com.mladich.lastactionnote.settings.LANSettingsService"/>
     </extensions>
+    <actions>
+        <!-- Define the Last Action Note group -->
+        <group id="LastActionNote" text="Last Action Note" description="Last action note settings" searchable="true" popup="true" compact="true">
+            <add-to-group group-id="ToolsBasicGroup" anchor="last"/>
+        </group>
+        <action id="PluginSettings.ToggleProjectExclusion" class="com.mladich.lastactionnote.settings.ToggleProjectExclusionAction" text="Exclude This Project" description="If enabled excludes this project from Last Action Note tracking">
+            <add-to-group group-id="LastActionNote"/>
+        </action>
+    </actions>
     <applicationListeners>
         <listener class="com.mladich.lastactionnote.listeners.FileListener" topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </applicationListeners>
