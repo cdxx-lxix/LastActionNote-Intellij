@@ -16,18 +16,9 @@ The data is stored in the root directory of every opened project in a ".lastacti
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="com.mladich.lastactionnote.listeners.OpeningProjectListener" />
-        <projectService serviceImplementation="com.mladich.lastactionnote.settings.LANSettingsService"/>
+        <applicationService serviceImplementation="com.mladich.lastactionnote.settings.LANSettingsService"/>
         <projectConfigurable displayName="Last Action Note" parentId="tools" instance="com.mladich.lastactionnote.settings.SettingsPanel" id="LANToolsTab"/>
     </extensions>
-    <actions>
-        <!-- Define the Last Action Note group -->
-        <group id="LastActionNote" text="Last Action Note" description="Last action note settings" searchable="true" popup="true" compact="true">
-            <add-to-group group-id="ToolsBasicGroup" anchor="last"/>
-        </group>
-        <action id="PluginSettings.ToggleProjectExclusion" class="com.mladich.lastactionnote.settings.ToggleProjectExclusionAction" text="Exclude This Project" description="If enabled excludes this project from Last Action Note tracking">
-            <add-to-group group-id="LastActionNote"/>
-        </action>
-    </actions>
     <applicationListeners>
         <listener class="com.mladich.lastactionnote.listeners.FileListener" topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
     </applicationListeners>

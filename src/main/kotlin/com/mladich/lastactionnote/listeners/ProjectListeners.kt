@@ -38,17 +38,24 @@ class OpeningProjectListener : StartupActivity {
     fun checkConditions(@NotNull project: Project): Boolean {
         val currentClosingProject = openedProjects[project] ?: return false
         return when {
-            currentClosingProject.isExcluded -> true // When excluded - close
+            exclusionCheck(project) -> true // When excluded - close
             currentClosingProject.isNoteSaved -> true // When not excluded and note is saved - close
             else -> showDialog(project, currentClosingProject) // When NOT excluded and NOT saved - show dialog
         }
     }
+    private fun exclusionCheck(project: Project): Boolean {
+        return ApplicationManager.getApplication().getService(LANSettingsService::class.java).state.excludedProjects.contains(project.name)
+    }
     override fun runActivity(@NotNull project: Project) {
+        println(ApplicationManager.getApplication().getService(LANSettingsService::class.java).state.excludedProjects)
         // Adds current instance to the map if it's not already present
         if (!openedProjects.containsKey(project)) {
             openedProjects[project] =
-                CommonData.Companion.ProjectData(isNoteSaved = false, fileHistory = mutableListOf(), fileCounter = 0, isExcluded = project.service<LANSettingsService>().state.projectExclusion)
+                CommonData.Companion.ProjectData(isNoteSaved = false,
+                    fileHistory = mutableListOf(), fileCounter = 0,
+                    isExcluded = exclusionCheck(project))
         }
+
         // This ugly monstrosity intercepts X-button behaviour and allows cancel of IDE closing
         val parentDisposable: Disposable = Disposer.newDisposable()
         ApplicationManager.getApplication().addApplicationListener(object : ApplicationListener {
@@ -64,7 +71,7 @@ class OpeningProjectListener : StartupActivity {
             }
         })
         // Checks the settings for exclusion. Starts services if it's FALSE (not excluded)
-        if (!project.service<LANSettingsService>().state.projectExclusion) {
+        if (!openedProjects[project]!!.isExcluded) {
             val dialogWindow = OpenNoteDialog(project)
             dialogWindow.showAndGet()
             project.service<FileHistory>() // Start history writing

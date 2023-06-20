@@ -1,7 +1,7 @@
 package com.mladich.lastactionnote.dialogs
 
 import com.intellij.AbstractBundle
-import com.intellij.openapi.components.service
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.dsl.builder.*
@@ -65,8 +65,10 @@ class OpenNoteDialog (project: Project): DialogWrapper(false) {
     override fun doOKAction() {
         super.doOKAction()
         // If a user ticks a checkbox changes settings value for exclusion
-        val projectSettings = myProject.service<LANSettingsService>().state
-        projectSettings.projectExclusion = checkbox
-        CommonData.openedProjects[myProject]!!.isExcluded = checkbox
+        if(checkbox) {
+            val projectSettings = ApplicationManager.getApplication().getService(LANSettingsService::class.java).state
+            projectSettings.excludedProjects.add(myProject.name)
+            CommonData.openedProjects[myProject]!!.isExcluded = checkbox
+        }
     }
 }
