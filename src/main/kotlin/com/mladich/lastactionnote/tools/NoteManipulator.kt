@@ -3,8 +3,8 @@ package com.mladich.lastactionnote.tools
 import com.google.gson.GsonBuilder
 import com.intellij.AbstractBundle
 import com.intellij.openapi.project.Project
-import com.mladich.lastactionnote.listeners.history
 import com.mladich.lastactionnote.tools.CommonData.Companion.currentDate
+import com.mladich.lastactionnote.tools.CommonData.Companion.history
 import com.mladich.lastactionnote.tools.CommonData.Companion.myBundle
 import com.mladich.lastactionnote.tools.CommonData.Companion.pluginFileName
 import java.io.File
@@ -30,7 +30,7 @@ class NoteManipulator {
         }
 
     fun openData(project: Project): Note {
-        // Tries to read the .lastactionnote file if there is none sets the date to default values
+        // Tries to read the .lastactionnote file if there is none sets the data to default values
         val mrJson = File(project.basePath, pluginFileName)
         var note: Note? = null
         try {

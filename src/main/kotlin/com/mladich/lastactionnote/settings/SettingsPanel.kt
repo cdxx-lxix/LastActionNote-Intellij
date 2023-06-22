@@ -2,11 +2,11 @@ package com.mladich.lastactionnote.settings
 
 import com.intellij.ide.RecentProjectListActionProvider
 import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.Configurable
 import com.intellij.ui.BooleanTableCellRenderer
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.table.JBTable
+import com.mladich.lastactionnote.tools.CommonData.Companion.pluginSettingsService
 import java.awt.BorderLayout
 import java.awt.Component
 import javax.swing.JCheckBox
@@ -25,8 +25,7 @@ class SettingsPanel : Configurable {
         setupTable()
     }
     private fun loadExcludedProjects(): Set<String> {
-        val settingsService = ApplicationManager.getApplication().getService(LANSettingsService::class.java)
-        return settingsService.state.excludedProjects
+        return pluginSettingsService.state.excludedProjects
     }
 
     private fun setupTable() {
@@ -66,13 +65,12 @@ class SettingsPanel : Configurable {
         }
     }
     override fun apply() {
-        val settingsService = ApplicationManager.getApplication().getService(LANSettingsService::class.java)
-        settingsService.state.excludedProjects.clear()
+        pluginSettingsService.state.excludedProjects.clear()
         (0 until tableModel.rowCount).forEach { rowIndex ->
             val projectName = tableModel.getValueAt(rowIndex, 0) as String
             val isExcluded = tableModel.getValueAt(rowIndex, 1) as Boolean
             if (isExcluded) {
-                settingsService.state.excludedProjects.add(projectName)
+                pluginSettingsService.state.excludedProjects.add(projectName)
             }
         }
     }

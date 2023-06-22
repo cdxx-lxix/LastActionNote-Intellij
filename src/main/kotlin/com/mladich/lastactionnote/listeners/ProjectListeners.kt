@@ -17,14 +17,13 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.mladich.lastactionnote.dialogs.CloseNoteDialog
 import com.mladich.lastactionnote.dialogs.OpenNoteDialog
-import com.mladich.lastactionnote.settings.LANSettingsService
 import com.mladich.lastactionnote.tools.CommonData
+import com.mladich.lastactionnote.tools.CommonData.Companion.history
 import com.mladich.lastactionnote.tools.CommonData.Companion.openedProjects
+import com.mladich.lastactionnote.tools.CommonData.Companion.pluginSettingsService
 import com.mladich.lastactionnote.tools.FileHistory
 import org.jetbrains.annotations.NotNull
 
-
-val history = service<FileHistory>()
 class OpeningProjectListener : StartupActivity {
     private fun showDialog(project: Project, currentClosingProject: CommonData.Companion.ProjectData): Boolean {
         val dialogWindow = CloseNoteDialog(project)
@@ -44,10 +43,9 @@ class OpeningProjectListener : StartupActivity {
         }
     }
     private fun exclusionCheck(project: Project): Boolean {
-        return ApplicationManager.getApplication().getService(LANSettingsService::class.java).state.excludedProjects.contains(project.name)
+        return pluginSettingsService.state.excludedProjects.contains(project.name)
     }
     override fun runActivity(@NotNull project: Project) {
-        println(ApplicationManager.getApplication().getService(LANSettingsService::class.java).state.excludedProjects)
         // Adds current instance to the map if it's not already present
         if (!openedProjects.containsKey(project)) {
             openedProjects[project] =
@@ -56,7 +54,7 @@ class OpeningProjectListener : StartupActivity {
                     isExcluded = exclusionCheck(project))
         }
 
-        // This ugly monstrosity intercepts X-button behaviour and allows cancel of IDE closing
+        // Anonymous listener that intercepts X-button behaviour and allows cancel of IDE closing
         val parentDisposable: Disposable = Disposer.newDisposable()
         ApplicationManager.getApplication().addApplicationListener(object : ApplicationListener {
             override fun canExitApplication(): Boolean {
@@ -64,7 +62,7 @@ class OpeningProjectListener : StartupActivity {
 
             }
         }, parentDisposable )
-        // This ugly monstrosity intercepts "close project" behaviour and allows cancel of project closing
+        // Anonymous listener that intercepts "close project" behaviour and allows cancel of project closing
         ProjectManager.getInstance().addProjectManagerListener(object : VetoableProjectManagerListener {
             override fun canClose(project: Project): Boolean {
                 return checkConditions(project)
